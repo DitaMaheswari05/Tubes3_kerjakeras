@@ -1,0 +1,1 @@
+# koneksi n query ke DB
