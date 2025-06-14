@@ -5,21 +5,37 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from FileParser import FileParser
 
 class SearchEngine:
+    _preprocessed: Dict[Path, str] = {}
+
+    @staticmethod
+    def Initialize():
+        base_path = Path('../data')
+        pdf_files = [file for file in base_path.glob("*/*.pdf") if file.is_file()]
+        print("Preprocessing files...")
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(FileParser.GetRawText, file) for file in pdf_files]
+            for file, future in zip(pdf_files, futures):
+                try:
+                    text = future.result()
+                    SearchEngine._preprocessed[file] = text
+                except Exception as e:
+                    print(f"Failed to parse {file}: {e}")
+
     @staticmethod
     def SearchExact(keywords: List[str], type: str, max: int = 5) -> List[Tuple[Path, int]]:
         if type not in ("KMP", "BM", "AC"):
             raise ValueError(f"Invalid algorithm '{type}'. Must be 'KMP', 'BM', or 'AC'.")
 
-        algo = (SearchEngine._KMP if type == "KMP"
-                else SearchEngine._BM if type == "BM"
-                else SearchEngine._AC)
+        algo = SearchEngine._KMP if type == "KMP" else SearchEngine._BM if type == "BM" else SearchEngine._AC
 
-        base_path = Path('../data')
-        pdf_files = [file for file in base_path.glob("*/*.pdf") if file.is_file()]
+        if not SearchEngine._preprocessed:
+            raise RuntimeError("No preprocessed data found. Call `Initialize()` first.")
 
         results = []
+
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(SearchEngine.process_file, file, algo, keywords) for file in pdf_files]
+            futures = [executor.submit(SearchEngine.process_text, path, text, algo, keywords)
+                    for path, text in SearchEngine._preprocessed.items()]
             for future in as_completed(futures):
                 result = future.result()
                 if result:
@@ -29,17 +45,15 @@ class SearchEngine:
         return results[:max]
 
     @staticmethod
-    def process_file(file: Path, algo: Callable[[str, List[str]], int], keywords: List[str]) -> Tuple[Path, int] | None:
+    def process_text(path: Path, text: str, algo: Callable[[str, List[str]], int], keywords: List[str]) -> Tuple[Path, int] | None:
         try:
-            text = FileParser.GetRawText(file)
             count = algo(text, keywords)
-            print(f"SEARCHING {file}: {count}")
-            return (file, count) if count > 0 else None
+            print(f"SEARCHING {path}: {count}")
+            return (path, count) if count > 0 else None
         except Exception as e:
-            print(f"Error processing {file}: {e}")
+            print(f"Error processing {path}: {e}")
             return None
         
-    #  Knuth‑Morris‑Pratt (KMP)
     @staticmethod
     def _KMP(text: str, keywords: List[str]) -> int:
         """
@@ -77,10 +91,8 @@ class SearchEngine:
                     if j == 0 and t[i] != pat[0]:
                         i += 1
             return matches
-
         return sum(_kmp_single(text, kw) for kw in keywords if kw)
 
-    #  Boyer‑Moore (BM)
     @staticmethod
     def _BM(text: str, keywords: List[str]) -> int:
         """
@@ -143,7 +155,6 @@ class SearchEngine:
 
         return sum(_bm_single(text, kw) for kw in keywords if kw)
 
-    #  Aho-Corasick (AC)
     @staticmethod
     def _AC(text: str, keywords: List[str]) -> int:
         """
