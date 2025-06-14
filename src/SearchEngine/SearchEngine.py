@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple
 from pathlib import Path
+from collections import deque
 
 from FileParser import FileParser
 
@@ -18,9 +19,11 @@ class SearchEngine:
             List[Tuple[Path, int]]: A list of tuples containing file paths and 
             their corresponding total match counts, sorted by most matches.
         """
-        if type not in ("KMP", "BM"):
+        if type not in ("KMP", "BM", "AC"):
             raise ValueError(f"Invalid algorithm '{type}'. Must be 'KMP' or 'BM'.")
-        algo = SearchEngine._KMP if type == "KMP" else SearchEngine._BM
+        algo = (SearchEngine._KMP if type == "KMP" else 
+                SearchEngine._BM if type == "BM" else
+                SearchEngine._AC)
 
         base_path = Path('../data')
         result: List[Tuple[Path, int]] = []
@@ -142,3 +145,58 @@ class SearchEngine:
             return matches
 
         return sum(_bm_single(text, kw) for kw in keywords if kw)
+
+
+        # ──────────────────────────────────────────────────────────────────────────
+
+    # ──────────────────────────────────────────────────────────────────────────
+    #  Aho-Corasick (AC)
+    # ──────────────────────────────────────────────────────────────────────────
+    @staticmethod
+    def _AC(text: str, keywords: List[str]) -> int:
+        """
+        Return the total number of (overlapping) occurrences of all
+        `keywords` inside `text` using the Aho-Corasick algorithm.
+        """
+        class Node:
+            def __init__(self):
+                self.children: Dict[str, Node] = {}
+                self.fail: 'Node' = None
+                self.output: List[str] = []
+
+        root = Node()
+        for word in keywords:
+            node = root
+            for char in word:
+                if char not in node.children:
+                    node.children[char] = Node()
+                node = node.children[char]
+            node.output.append(word)
+
+        queue = deque()
+        for child in root.children.values():
+            child.fail = root
+            queue.append(child)
+
+        while queue:
+            current_node = queue.popleft()
+            for char, child_node in current_node.children.items():
+                fail_node = current_node.fail
+                while fail_node and char not in fail_node.children:
+                    fail_node = fail_node.fail
+                child_node.fail = fail_node.children[char] if fail_node and char in fail_node.children else root
+                child_node.output += child_node.fail.output
+                queue.append(child_node)
+
+        node = root
+        count = 0
+        for char in text:
+            while node and char not in node.children:
+                node = node.fail
+            if not node:
+                node = root
+                continue
+            node = node.children[char]
+            count += len(node.output)
+
+        return count
