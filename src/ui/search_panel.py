@@ -127,7 +127,7 @@ class SearchPanel(QFrame):
         algo_label.setStyleSheet("color: #553c9a; margin-bottom: 8px;")
         
         self.algo_combo = QComboBox()
-        self.algo_combo.addItems(['KMP', 'BM','Fuzzy Matching'])
+        self.algo_combo.addItems(['KMP', 'BM','Aho-Corasick'])
         self.algo_combo.setStyleSheet("""
             QComboBox {
                 border: 2px solid rgba(102, 126, 234, 0.3);
