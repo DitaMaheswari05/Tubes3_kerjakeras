@@ -1,46 +1,45 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Callable
 from pathlib import Path
 from collections import deque
-
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from FileParser import FileParser
 
 class SearchEngine:
     @staticmethod
     def SearchExact(keywords: List[str], type: str, max: int = 5) -> List[Tuple[Path, int]]:
-        """
-        Search keyword(s) in the data directory using the specified algorithm.
-
-        Args:
-            keywords (List[str]): The list of keywords to search for.
-            type (str): Algorithm to use ("KMP" or "BM").
-            max (int): Maximum number of files to return (default is 5).
-
-        Returns:
-            List[Tuple[Path, int]]: A list of tuples containing file paths and 
-            their corresponding total match counts, sorted by most matches.
-        """
         if type not in ("KMP", "BM", "AC"):
-            raise ValueError(f"Invalid algorithm '{type}'. Must be 'KMP' or 'BM'.")
-        algo = (SearchEngine._KMP if type == "KMP" else 
-                SearchEngine._BM if type == "BM" else
-                SearchEngine._AC)
+            raise ValueError(f"Invalid algorithm '{type}'. Must be 'KMP', 'BM', or 'AC'.")
+
+        algo = (SearchEngine._KMP if type == "KMP"
+                else SearchEngine._BM if type == "BM"
+                else SearchEngine._AC)
 
         base_path = Path('../data')
-        result: List[Tuple[Path, int]] = []
-        for file in base_path.glob("*/*.pdf"):
-            if file.is_file():
-                print(f"SEARCHING {file}: ", end=" ")
-                text = FileParser.GetRawText(file)
-                count = algo(text, keywords)
-                if count > 0:
-                    result.append((file, count))
-                print(count)
-        result.sort(key=lambda x: x[1], reverse=True)
-        return result[:max]
+        pdf_files = [file for file in base_path.glob("*/*.pdf") if file.is_file()]
 
-    # ──────────────────────────────────────────────────────────────────────────
+        results = []
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(SearchEngine.process_file, file, algo, keywords) for file in pdf_files]
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    results.append(result)
+
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results[:max]
+
+    @staticmethod
+    def process_file(file: Path, algo: Callable[[str, List[str]], int], keywords: List[str]) -> Tuple[Path, int] | None:
+        try:
+            text = FileParser.GetRawText(file)
+            count = algo(text, keywords)
+            print(f"SEARCHING {file}: {count}")
+            return (file, count) if count > 0 else None
+        except Exception as e:
+            print(f"Error processing {file}: {e}")
+            return None
+        
     #  Knuth‑Morris‑Pratt (KMP)
-    # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     def _KMP(text: str, keywords: List[str]) -> int:
         """
@@ -81,9 +80,7 @@ class SearchEngine:
 
         return sum(_kmp_single(text, kw) for kw in keywords if kw)
 
-    # ──────────────────────────────────────────────────────────────────────────
     #  Boyer‑Moore (BM)
-    # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     def _BM(text: str, keywords: List[str]) -> int:
         """
@@ -146,12 +143,7 @@ class SearchEngine:
 
         return sum(_bm_single(text, kw) for kw in keywords if kw)
 
-
-        # ──────────────────────────────────────────────────────────────────────────
-
-    # ──────────────────────────────────────────────────────────────────────────
     #  Aho-Corasick (AC)
-    # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     def _AC(text: str, keywords: List[str]) -> int:
         """
