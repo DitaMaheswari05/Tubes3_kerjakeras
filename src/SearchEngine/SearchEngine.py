@@ -11,19 +11,15 @@ class SearchEngine:
     def Initialize():
         base_path = Path('../data')
         pdf_files = [file for file in base_path.glob("*/*.pdf") if file.is_file()]
-        print("Preprocessing files...")
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(FileParser.GetRawText, file) for file in pdf_files]
-            i = 0
             for file, future in zip(pdf_files, futures):
                 try:
-                    print(i)
-                    i = i + 1
                     text = future.result()
                     SearchEngine._preprocessed[file] = text
+                    print(f"PROCESSING {file}.")
                 except Exception as e:
                     print(f"Failed to parse {file}: {e}")
-            print("don")
 
     @staticmethod
     def SearchExact(keywords: List[str], type: str, max: int = 5) -> List[Tuple[Path, int]]:
