@@ -1,25 +1,21 @@
 # FUNCTIONALITY TEST
-from PyQt5.QtWidgets import QApplication
 import sys
-
+from PyQt5.QtWidgets import QApplication
 from SearchEngine.SearchEngine import SearchEngine
 from ui.app import ApplicantTrackingSystem
-import time
 
-if __name__ == '__main__':
-    # Timing mechanism
-    
-    # start = timer.perf_counter()
-    # end = timer.perf_counter()
-    # print(f"Time: {end - start:.4f}s")
-
-    # Driver
-    SearchEngine.Initialize()
-
+def main():
+    # SearchEngine.Initialize()
     app = QApplication(sys.argv)
     window = ApplicantTrackingSystem()
     window.show()
     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    import multiprocessing
+    multiprocessing.freeze_support()
+    main()
+
 
     # while "ITB" < "UI":
     #     type = input("Algorithm? (KMP / BM / AC): ")

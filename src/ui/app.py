@@ -9,11 +9,13 @@ from ui.detail_viewer import DetailViewer
 from ui.summary_page import CVSummaryPage
 from SearchEngine.SearchEngine import SearchEngine
 from extraction.extractor import extract_cv_summary
+from database.db import get_applicant_profile_by_cv_path
 from pathlib import Path
 
 class ApplicantTrackingSystem(QMainWindow):
     def __init__(self):
         super().__init__()
+        SearchEngine.Initialize()
         self.detail_viewer = None
         self.summary_dialog = None
         self.initUI()
@@ -127,41 +129,44 @@ class ApplicantTrackingSystem(QMainWindow):
         main_layout.addLayout(content_layout)
         
         central_widget.setLayout(main_layout)
-        
     def perform_search(self, search_params):
         keywords = search_params.get('keywords', '').split()
         algorithm = search_params.get('algorithm', 'KMP')
         max_results = search_params.get('max_results', 10)
 
-        # pencarian menggunakan SearchEngine
         results = SearchEngine.SearchExact(keywords, algorithm if algorithm != "Aho-Corasick" else "AC", max_results)
-
-        # Bangun list CV untuk result_panel
         cv_list = []
+
         for path, match_count in results:
             raw_text = SearchEngine._preprocessed[path]
             extracted = extract_cv_summary(raw_text)
+
+            profile = get_applicant_profile_by_cv_path(str(path.resolve()))
+
+            if profile:
+                full_name = f"{profile['first_name']} {profile['last_name']}"
+                birthdate = str(profile['date_of_birth'])
+                address = profile['address']
+                phone = profile['phone_number']
+            else:
+                first_line = raw_text.strip().split('\n', 1)[0]
+                full_name = first_line if len(first_line.split()) <= 5 else path.stem
+                birthdate = "Unknown"
+                address = "Unknown"
+                phone = "Unknown"
+
             cv_list.append({
-                'name': path.stem,
+                'name': full_name,
                 'matches': match_count,
                 'skills': ', '.join(extracted.get('skills', [])),
                 'experience': f"{len(extracted.get('job', []))} jobs",
-                'birthdate': "Unknown",
-                'address': "Unknown",
-                'phone': "Unknown",
-                'job_history': [{
-                    'position': job['position'],
-                    'period': f"{job['start']}-{job['end']}",
-                    'description': "Experience info"
-                } for job in extracted.get('job', [])],
-                'education': [{
-                    'degree': edu['degree'],
-                    'institution': edu['university'],
-                    'period': f"{edu['start']}-{edu['end']}"
-                } for edu in extracted.get('education', [])]
+                'birthdate': birthdate,
+                'address': address,
+                'phone': phone,
+                'job_history': [],
+                'education': []
             })
 
-        # Tampilkan hasil di ResultPanel
         self.result_panel.update_results(cv_list)
         
     def handle_file_upload(self, file_paths):

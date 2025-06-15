@@ -18,6 +18,23 @@ def test_connection():
         print(table_name)
     cursor.close()
     conn.close()
+    
+def get_applicant_profile_by_cv_path(cv_path: str):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT ap.first_name, ap.last_name, ap.date_of_birth, ap.address, ap.phone_number
+        FROM ApplicationDetail ad
+        JOIN ApplicantProfile ap ON ad.applicant_id = ap.applicant_id
+        WHERE ad.cv_path = %s
+        LIMIT 1
+    """
+    cursor.execute(query, (cv_path,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result
+
 
 if __name__ == "__main__":
     test_connection()

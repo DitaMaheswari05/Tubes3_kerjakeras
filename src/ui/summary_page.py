@@ -59,6 +59,7 @@ class InfoCard(QFrame):
 class CVSummaryPage(QDialog):
     def __init__(self, cv_data=None):
         super().__init__()
+        self.setAttribute(Qt.WA_DeleteOnClose)
         self.cv_data = cv_data
         self.initUI()
         

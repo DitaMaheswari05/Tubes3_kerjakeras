@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: tubes3-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tubes3db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./tubes3_seeding.sql:/docker-entrypoint-initdb.d/init.sql
