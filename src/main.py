@@ -1,25 +1,63 @@
-import os
+# FUNCTIONALITY TEST
+from PyQt5.QtWidgets import QApplication
+import sys
 
-def keep_first_20_pdfs(data_path='data'):
-    for role in os.listdir(data_path):
-        role_path = os.path.join(data_path, role)
-        if not os.path.isdir(role_path):
-            continue
-
-        # Get list of all .pdf files and sort lexicographically
-        pdf_files = [f for f in os.listdir(role_path) if f.lower().endswith('.pdf')]
-        pdf_files.sort()  # Lexicographic sort
-
-        # Keep only the first 20
-        to_delete = pdf_files[20:]
-
-        for file in to_delete:
-            file_path = os.path.join(role_path, file)
-            try:
-                os.remove(file_path)
-                print(f"Deleted: {file_path}")
-            except Exception as e:
-                print(f"Error deleting {file_path}: {e}")
+from SearchEngine.SearchEngine import SearchEngine
+from ui.app import ApplicantTrackingSystem
+import time
 
 if __name__ == '__main__':
-    keep_first_20_pdfs()
+    # Timing mechanism
+    
+    # start = timer.perf_counter()
+    # end = timer.perf_counter()
+    # print(f"Time: {end - start:.4f}s")
+
+    # Driver
+    SearchEngine.Initialize()
+
+    app = QApplication(sys.argv)
+    window = ApplicantTrackingSystem()
+    window.show()
+    sys.exit(app.exec_())
+
+    # while "ITB" < "UI":
+    #     type = input("Algorithm? (KMP / BM / AC): ")
+    #     max = int(input("Maximum files returned: "))
+    #     n = int(input("Number of keywords: "))
+    #     keywords = []
+    #     for i in range(n):
+    #         keywords.append(input(f"Keywords {i+1}: "))
+    #     start = time.perf_counter()
+    #     ans = SearchEngine.SearchExact(keywords, type, max)
+    #     end = time.perf_counter()
+    #     for path, count in ans:
+    #         print(path, count)
+    #     print(f"RUNTIME : {end-start:.4f}")        
+
+    # TESTS
+
+    # Init
+    # startI = time.perf_counter()
+    # SearchEngine.Initialize()
+    # endI = time.perf_counter()
+
+    # TC 1 
+    # startP1 = time.perf_counter()
+    # SearchEngine.SearchExact(["skill", "work", "technology"], "KMP", 5)
+    # endP1 = time.perf_counter()
+
+    # TC 2 
+    # startP2 = time.perf_counter()
+    # SearchEngine.SearchExact(["and", "the", "to", "are"], "KMP", 10)
+    # endP2 = time.perf_counter()
+    
+    # TC 3
+    # startP3 = time.perf_counter()
+    # print(SearchEngine.SearchFuzzy(["softwaredx"], 2, 5))
+    # endP3 = time.perf_counter()
+
+    # print(f"Init Time: {endI - startI:.4f}s")
+    # print(f"Process Time TC1: {endP1 - startP1:.4f}s")
+    # print(f"Process Time TC2: {endP2 - startP2:.4f}s")
+    # print(f"Process Time TC3: {endP3-startP3:.4f}")

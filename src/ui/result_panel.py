@@ -253,8 +253,8 @@ class ResultPanel(QFrame):
         self.results_layout = QVBoxLayout()
         self.results_layout.setSpacing(10)
         
-        # Add initial sample results
-        self.add_sample_results()
+        # # Add initial sample results
+        # self.add_sample_results()
         
         self.results_widget.setLayout(self.results_layout)
         scroll_area.setWidget(self.results_widget)
@@ -264,188 +264,188 @@ class ResultPanel(QFrame):
         
         self.setLayout(layout)
     
-    def add_sample_results(self):
-        # Enhanced sample CVs with more detailed data
-        sample_cvs = [
-            {
-                "name": "John Smith", 
-                "matches": 8, 
-                "skills": "React, HTML, CSS, JavaScript, Node.js", 
-                "experience": "5 years",
-                "birthdate": "15-03-1992",
-                "address": "123 Tech Street, Silicon Valley, CA",
-                "phone": "0812 1234 5678",
-                "job_history": [
-                    {
-                        'position': 'Senior Frontend Developer',
-                        'period': '2020-Present',
-                        'description': "Leading frontend development team, implementing React applications with modern UI/UX practices"
-                    },
-                    {
-                        'position': 'Frontend Developer',
-                        'period': '2018-2020',
-                        'description': "Developed responsive web applications using HTML, CSS, and JavaScript"
-                    }
-                ],
-                "education": [
-                    {
-                        'degree': 'Computer Science',
-                        'institution': 'Stanford University',
-                        'period': '2014-2018'
-                    }
-                ]
-            },
-            {
-                "name": "Sarah Johnson", 
-                "matches": 6, 
-                "skills": "Python, Django, PostgreSQL, Docker", 
-                "experience": "3 years",
-                "birthdate": "22-07-1995",
-                "address": "456 Python Ave, New York, NY",
-                "phone": "0813 2345 6789",
-                "job_history": [
-                    {
-                        'position': 'Backend Developer',
-                        'period': '2021-Present',
-                        'description': "Developing scalable backend systems using Python and Django framework"
-                    }
-                ],
-                "education": [
-                    {
-                        'degree': 'Software Engineering',
-                        'institution': 'MIT',
-                        'period': '2017-2021'
-                    }
-                ]
-            },
-            {
-                "name": "Mike Chen", 
-                "matches": 7, 
-                "skills": "Java, Spring Boot, MySQL, AWS", 
-                "experience": "4 years",
-                "birthdate": "10-11-1993",
-                "address": "789 Java Lane, Seattle, WA",
-                "phone": "0814 3456 7890",
-                "job_history": [
-                    {
-                        'position': 'Full Stack Java Developer',
-                        'period': '2019-Present',
-                        'description': "Building enterprise applications using Java Spring Boot and cloud technologies"
-                    }
-                ],
-                "education": [
-                    {
-                        'degree': 'Computer Engineering',
-                        'institution': 'University of Washington',
-                        'period': '2015-2019'
-                    }
-                ]
-            },
-            {
-                "name": "Emily Davis", 
-                "matches": 5, 
-                "skills": "React, TypeScript, GraphQL, MongoDB", 
-                "experience": "2 years",
-                "birthdate": "05-04-1997",
-                "address": "321 GraphQL Street, Austin, TX",
-                "phone": "0815 4567 8901",
-                "job_history": [
-                    {
-                        'position': 'Junior Full Stack Developer',
-                        'period': '2022-Present',
-                        'description': "Working with modern web technologies including React, TypeScript, and GraphQL"
-                    }
-                ],
-                "education": [
-                    {
-                        'degree': 'Information Technology',
-                        'institution': 'University of Texas at Austin',
-                        'period': '2019-2022'
-                    }
-                ]
-            },
-            {
-                "name": "Alex Rodriguez", 
-                "matches": 9, 
-                "skills": "Full Stack, React, Node.js, Express, SQL", 
-                "experience": "6 years",
-                "birthdate": "18-09-1990",
-                "address": "654 Full Stack Blvd, San Francisco, CA",
-                "phone": "0816 5678 9012",
-                "job_history": [
-                    {
-                        'position': 'Lead Full Stack Developer',
-                        'period': '2018-Present',
-                        'description': "Leading development of complete web applications from frontend to backend"
-                    },
-                    {
-                        'position': 'Full Stack Developer',
-                        'period': '2016-2018',
-                        'description': "Developed end-to-end web solutions using modern JavaScript technologies"
-                    }
-                ],
-                "education": [
-                    {
-                        'degree': 'Software Development',
-                        'institution': 'UC Berkeley',
-                        'period': '2012-2016'
-                    }
-                ]
-            }
-        ]
+    # def add_sample_results(self):
+    #     # Enhanced sample CVs with more detailed data
+    #     sample_cvs = [
+    #         {
+    #             "name": "John Smith", 
+    #             "matches": 8, 
+    #             "skills": "React, HTML, CSS, JavaScript, Node.js", 
+    #             "experience": "5 years",
+    #             "birthdate": "15-03-1992",
+    #             "address": "123 Tech Street, Silicon Valley, CA",
+    #             "phone": "0812 1234 5678",
+    #             "job_history": [
+    #                 {
+    #                     'position': 'Senior Frontend Developer',
+    #                     'period': '2020-Present',
+    #                     'description': "Leading frontend development team, implementing React applications with modern UI/UX practices"
+    #                 },
+    #                 {
+    #                     'position': 'Frontend Developer',
+    #                     'period': '2018-2020',
+    #                     'description': "Developed responsive web applications using HTML, CSS, and JavaScript"
+    #                 }
+    #             ],
+    #             "education": [
+    #                 {
+    #                     'degree': 'Computer Science',
+    #                     'institution': 'Stanford University',
+    #                     'period': '2014-2018'
+    #                 }
+    #             ]
+    #         },
+    #         {
+    #             "name": "Sarah Johnson", 
+    #             "matches": 6, 
+    #             "skills": "Python, Django, PostgreSQL, Docker", 
+    #             "experience": "3 years",
+    #             "birthdate": "22-07-1995",
+    #             "address": "456 Python Ave, New York, NY",
+    #             "phone": "0813 2345 6789",
+    #             "job_history": [
+    #                 {
+    #                     'position': 'Backend Developer',
+    #                     'period': '2021-Present',
+    #                     'description': "Developing scalable backend systems using Python and Django framework"
+    #                 }
+    #             ],
+    #             "education": [
+    #                 {
+    #                     'degree': 'Software Engineering',
+    #                     'institution': 'MIT',
+    #                     'period': '2017-2021'
+    #                 }
+    #             ]
+    #         },
+    #         {
+    #             "name": "Mike Chen", 
+    #             "matches": 7, 
+    #             "skills": "Java, Spring Boot, MySQL, AWS", 
+    #             "experience": "4 years",
+    #             "birthdate": "10-11-1993",
+    #             "address": "789 Java Lane, Seattle, WA",
+    #             "phone": "0814 3456 7890",
+    #             "job_history": [
+    #                 {
+    #                     'position': 'Full Stack Java Developer',
+    #                     'period': '2019-Present',
+    #                     'description': "Building enterprise applications using Java Spring Boot and cloud technologies"
+    #                 }
+    #             ],
+    #             "education": [
+    #                 {
+    #                     'degree': 'Computer Engineering',
+    #                     'institution': 'University of Washington',
+    #                     'period': '2015-2019'
+    #                 }
+    #             ]
+    #         },
+    #         {
+    #             "name": "Emily Davis", 
+    #             "matches": 5, 
+    #             "skills": "React, TypeScript, GraphQL, MongoDB", 
+    #             "experience": "2 years",
+    #             "birthdate": "05-04-1997",
+    #             "address": "321 GraphQL Street, Austin, TX",
+    #             "phone": "0815 4567 8901",
+    #             "job_history": [
+    #                 {
+    #                     'position': 'Junior Full Stack Developer',
+    #                     'period': '2022-Present',
+    #                     'description': "Working with modern web technologies including React, TypeScript, and GraphQL"
+    #                 }
+    #             ],
+    #             "education": [
+    #                 {
+    #                     'degree': 'Information Technology',
+    #                     'institution': 'University of Texas at Austin',
+    #                     'period': '2019-2022'
+    #                 }
+    #             ]
+    #         },
+    #         {
+    #             "name": "Alex Rodriguez", 
+    #             "matches": 9, 
+    #             "skills": "Full Stack, React, Node.js, Express, SQL", 
+    #             "experience": "6 years",
+    #             "birthdate": "18-09-1990",
+    #             "address": "654 Full Stack Blvd, San Francisco, CA",
+    #             "phone": "0816 5678 9012",
+    #             "job_history": [
+    #                 {
+    #                     'position': 'Lead Full Stack Developer',
+    #                     'period': '2018-Present',
+    #                     'description': "Leading development of complete web applications from frontend to backend"
+    #                 },
+    #                 {
+    #                     'position': 'Full Stack Developer',
+    #                     'period': '2016-2018',
+    #                     'description': "Developed end-to-end web solutions using modern JavaScript technologies"
+    #                 }
+    #             ],
+    #             "education": [
+    #                 {
+    #                     'degree': 'Software Development',
+    #                     'institution': 'UC Berkeley',
+    #                     'period': '2012-2016'
+    #                 }
+    #             ]
+    #         }
+    #     ]
         
-        for cv_data in sample_cvs:
-            cv_card = CVCard(cv_data)
-            cv_card.view_requested.connect(self.cv_view_requested.emit)
-            cv_card.summary_requested.connect(self.cv_summary_requested.emit)
-            self.results_layout.addWidget(cv_card)
+    #     for cv_data in sample_cvs:
+    #         cv_card = CVCard(cv_data)
+    #         cv_card.view_requested.connect(self.cv_view_requested.emit)
+    #         cv_card.summary_requested.connect(self.cv_summary_requested.emit)
+    #         self.results_layout.addWidget(cv_card)
         
-        self.results_layout.addStretch()
+    #     self.results_layout.addStretch()
     
-    def perform_search(self, keywords, algorithm, max_results):
-        # Catat waktu mulai pencarian
-        self.search_start_time = time.time()
+    # def perform_search(self, keywords, algorithm, max_results):
+    #     # Catat waktu mulai pencarian
+    #     self.search_start_time = time.time()
         
-        self.stats_label.setText('🔍 Searching...')
+    #     self.stats_label.setText('🔍 Searching...')
         
-        # Clear existing results
-        self.clear_results()
+    #     # Clear existing results
+    #     self.clear_results()
         
-        # Simulasi proses pencarian dengan delay yang bervariasi
-        search_delay = self.calculate_search_delay(keywords, max_results)
+    #     # Simulasi proses pencarian dengan delay yang bervariasi
+    #     search_delay = self.calculate_search_delay(keywords, max_results)
         
-        # Gunakan QTimer untuk menjalankan pencarian setelah delay
-        QTimer.singleShot(search_delay, lambda: self.show_search_results(keywords, max_results))
+    #     # Gunakan QTimer untuk menjalankan pencarian setelah delay
+    #     QTimer.singleShot(search_delay, lambda: self.show_search_results(keywords, max_results))
     
-    def calculate_search_delay(self, keywords, max_results):
-        # Base delay minimal 50ms
-        base_delay = 50
+    # def calculate_search_delay(self, keywords, max_results):
+    #     # Base delay minimal 50ms
+    #     base_delay = 50
         
-        # Tambah delay berdasarkan jumlah keyword (10ms per kata)
-        keyword_count = len(keywords.split()) if keywords else 1
-        keyword_delay = keyword_count * 10
+    #     # Tambah delay berdasarkan jumlah keyword (10ms per kata)
+    #     keyword_count = len(keywords.split()) if keywords else 1
+    #     keyword_delay = keyword_count * 10
         
-        # Tambah delay berdasarkan jumlah hasil maksimal (1ms per 10 hasil)
-        result_delay = max_results // 10
+    #     # Tambah delay berdasarkan jumlah hasil maksimal (1ms per 10 hasil)
+    #     result_delay = max_results // 10
         
-        # Total delay antara 50ms - 500ms
-        total_delay = min(base_delay + keyword_delay + result_delay, 500)
+    #     # Total delay antara 50ms - 500ms
+    #     total_delay = min(base_delay + keyword_delay + result_delay, 500)
         
-        return total_delay
+    #     return total_delay
     
-    def show_search_results(self, keywords, max_results):
-        # Hitung waktu pencarian yang sebenarnya
-        if self.search_start_time:
-            elapsed_time = time.time() - self.search_start_time
-            elapsed_ms = round(elapsed_time * 1000)  # Konversi ke milidetik
-        else:
-            elapsed_ms = 0
+    # def show_search_results(self, keywords, max_results):
+    #     # Hitung waktu pencarian yang sebenarnya
+    #     if self.search_start_time:
+    #         elapsed_time = time.time() - self.search_start_time
+    #         elapsed_ms = round(elapsed_time * 1000)  # Konversi ke milidetik
+    #     else:
+    #         elapsed_ms = 0
         
-        # Tampilkan hasil dengan waktu pencarian realtime
-        self.stats_label.setText(f'✅ {max_results} CVs found in {elapsed_ms}ms')
+    #     # Tampilkan hasil dengan waktu pencarian realtime
+    #     self.stats_label.setText(f'✅ {max_results} CVs found in {elapsed_ms}ms')
         
-        # Tambahkan hasil pencarian
-        self.add_sample_results()
+    #     # Tambahkan hasil pencarian
+    #     self.add_sample_results()
     
     def clear_results(self):
         for i in reversed(range(self.results_layout.count())):
@@ -453,15 +453,29 @@ class ResultPanel(QFrame):
             if child:
                 child.setParent(None)
     
-    def refresh_results(self):
-        # Catat waktu mulai refresh
-        start_time = time.time()
+    # def refresh_results(self):
+    #     # Catat waktu mulai refresh
+    #     start_time = time.time()
         
+    #     self.clear_results()
+    #     self.add_sample_results()
+        
+    #     # Hitung waktu refresh
+    #     elapsed_time = time.time() - start_time
+    #     elapsed_ms = round(elapsed_time * 1000)
+        
+    #     self.stats_label.setText(f'🔄 Results refreshed in {elapsed_ms}ms')
+    
+    def update_results(self, cv_list):
+        start_time = time.time()  # ⏱️ Start timing
+
         self.clear_results()
-        self.add_sample_results()
-        
-        # Hitung waktu refresh
-        elapsed_time = time.time() - start_time
-        elapsed_ms = round(elapsed_time * 1000)
-        
-        self.stats_label.setText(f'🔄 Results refreshed in {elapsed_ms}ms')
+        for cv_data in cv_list:
+            card = CVCard(cv_data)
+            card.view_requested.connect(self.cv_view_requested.emit)
+            card.summary_requested.connect(self.cv_summary_requested.emit)
+            self.results_layout.addWidget(card)
+        self.results_layout.addStretch()
+
+        elapsed_ms = round((time.time() - start_time) * 1000)  # ⏱️ Elapsed time
+        self.stats_label.setText(f"✅ {len(cv_list)} CVs found in {elapsed_ms}ms")

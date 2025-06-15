@@ -3,10 +3,13 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QScrollArea)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QPalette, QColor
-from search_panel import SearchPanel
-from result_panel import ResultPanel
-from detail_viewer import DetailViewer
-from summary_page import CVSummaryPage
+from ui.search_panel import SearchPanel
+from ui.result_panel import ResultPanel
+from ui.detail_viewer import DetailViewer
+from ui.summary_page import CVSummaryPage
+from SearchEngine.SearchEngine import SearchEngine
+from extraction.extractor import extract_cv_summary
+from pathlib import Path
 
 class ApplicantTrackingSystem(QMainWindow):
     def __init__(self):
@@ -126,12 +129,40 @@ class ApplicantTrackingSystem(QMainWindow):
         central_widget.setLayout(main_layout)
         
     def perform_search(self, search_params):
-        keywords = search_params.get('keywords', '')
-        algorithm = search_params.get('algorithm', '')
+        keywords = search_params.get('keywords', '').split()
+        algorithm = search_params.get('algorithm', 'KMP')
         max_results = search_params.get('max_results', 10)
-        
-        # Simulate search and update results
-        self.result_panel.perform_search(keywords, algorithm, max_results)
+
+        # pencarian menggunakan SearchEngine
+        results = SearchEngine.SearchExact(keywords, algorithm if algorithm != "Aho-Corasick" else "AC", max_results)
+
+        # Bangun list CV untuk result_panel
+        cv_list = []
+        for path, match_count in results:
+            raw_text = SearchEngine._preprocessed[path]
+            extracted = extract_cv_summary(raw_text)
+            cv_list.append({
+                'name': path.stem,
+                'matches': match_count,
+                'skills': ', '.join(extracted.get('skills', [])),
+                'experience': f"{len(extracted.get('job', []))} jobs",
+                'birthdate': "Unknown",
+                'address': "Unknown",
+                'phone': "Unknown",
+                'job_history': [{
+                    'position': job['position'],
+                    'period': f"{job['start']}-{job['end']}",
+                    'description': "Experience info"
+                } for job in extracted.get('job', [])],
+                'education': [{
+                    'degree': edu['degree'],
+                    'institution': edu['university'],
+                    'period': f"{edu['start']}-{edu['end']}"
+                } for edu in extracted.get('education', [])]
+            })
+
+        # Tampilkan hasil di ResultPanel
+        self.result_panel.update_results(cv_list)
         
     def handle_file_upload(self, file_paths):
         print(f"Files uploaded: {file_paths}")
