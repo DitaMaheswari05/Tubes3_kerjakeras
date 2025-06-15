@@ -3,6 +3,10 @@ from PyQt5.QtWidgets import QApplication
 import sys
 
 from SearchEngine import SearchEngine
+import mysql.connector
+from database.Database import Database
+from database.Encryptor import Encryptor 
+
 from ui.app import App
 import time
 
@@ -14,12 +18,12 @@ if __name__ == '__main__':
     # print(f"Time: {end - start:.4f}s")
 
     # Driver
-    SearchEngine.Initialize()
+    # SearchEngine.Initialize()
 
-    app = QApplication(sys.argv)
-    window = App()
-    window.show()
-    sys.exit(app.exec_())
+    # app = QApplication(sys.argv)
+    # window = App()
+    # window.show()
+    # sys.exit(app.exec_())
 
     # while "ITB" < "UI":
     #     type = input("Algorithm? (KMP / BM / AC): ")
@@ -61,3 +65,21 @@ if __name__ == '__main__':
     # print(f"Process Time TC1: {endP1 - startP1:.4f}s")
     # print(f"Process Time TC2: {endP2 - startP2:.4f}s")
     # print(f"Process Time TC3: {endP3-startP3:.4f}")
+
+    import traceback
+    try:
+        encrypt = Encryptor("TUBES")
+        db = Database(
+            host="localhost",  
+            port=4306,          
+            user="root",
+            password="root",
+            database="tubes3db",
+            encryptor=encrypt,
+        )
+
+        result = db.run_query("SELECT * FROM ApplicantProfile", decrypt_fields=["first_name", "phone_number"], weak_fields=["phone_number"])
+        print("Result:", result)
+
+    except Exception as e:
+        traceback.print_exc()
