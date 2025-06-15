@@ -1,220 +1,178 @@
-import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QScrollArea)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QPalette, QColor
-from ui.search_panel import SearchPanel
-from ui.result_panel import ResultPanel
-from ui.detail_viewer import DetailViewer
-from ui.summary_page import CVSummaryPage
 from SearchEngine.SearchEngine import SearchEngine
 from extraction.extractor import extract_cv_summary
-from database.db import get_applicant_profile_by_cv_path
+from .InfoWindow import InfoWindow
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+    QLineEdit, QComboBox, QSpinBox, QPushButton, QLabel, QScrollArea, QFrame
+)
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QDesktopServices
 from pathlib import Path
+import time
 
-class ApplicantTrackingSystem(QMainWindow):
+class App(QMainWindow):
     def __init__(self):
         super().__init__()
-        SearchEngine.Initialize()
-        self.detail_viewer = None
-        self.summary_dialog = None
+        self.setWindowTitle("Minimal ATS")
+        self.setGeometry(100, 100, 1000, 700)
         self.initUI()
-        
+    
     def initUI(self):
-        self.setWindowTitle('Applicant Tracking System')
-        self.setGeometry(100, 100, 1400, 900)
-        
-        # Set application style with blue-purple gradient
-        self.setStyleSheet("""
-            QMainWindow {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #667eea, stop:0.3 #764ba2, stop:0.7 #f093fb, stop:1 #f5576c);
-            }
-        """)
-        
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(25)
-        main_layout.setContentsMargins(40, 40, 40, 40)
-        
-        # Enhanced title with gradient text effect
-        title = QLabel('Applicant Tracking System')
-        title.setAlignment(Qt.AlignCenter)
-        title.setFont(QFont("Segoe UI", 36, QFont.Bold))
-        title.setStyleSheet("""
-            QLabel {
-                color: white;
-                margin: 25px 0 50px 0;
-                background: transparent;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                padding: 20px;
-                border-radius: 20px;
-                background: rgba(255,255,255,0.1);
-                backdrop-filter: blur(10px);
-            }
-        """)
-        
-        # Content layout with glass morphism effect
-        content_layout = QHBoxLayout()
-        content_layout.setSpacing(30)
-        
-        # Create scrollable left panel
-        left_scroll_area = QScrollArea()
-        left_scroll_area.setWidgetResizable(True)
-        left_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        left_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        left_scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-                border-radius: 15px;
-            }
-            QScrollBar:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 rgba(255,255,255,0.2), stop:1 rgba(240,147,251,0.2));
-                width: 12px;
-                border-radius: 6px;
-                margin: 2px;
-            }
-            QScrollBar::handle:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 rgba(255,255,255,0.8), stop:1 rgba(240,147,251,0.8));
-                border-radius: 5px;
-                min-height: 20px;
-                margin: 1px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 rgba(255,255,255,0.9), stop:1 rgba(240,147,251,0.9));
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: transparent;
-            }
-        """)
-        
-        # Left side content widget
-        left_content_widget = QWidget()
-        left_layout = QVBoxLayout()
-        left_layout.setSpacing(25)
-        left_layout.setContentsMargins(10, 10, 10, 10)
-        
-        # Search panel
-        self.search_panel = SearchPanel()
-        self.search_panel.search_requested.connect(self.perform_search)
-        left_layout.addWidget(self.search_panel)
-        
-        # Add some spacing at the bottom
-        left_layout.addStretch()
-        
-        left_content_widget.setLayout(left_layout)
-        left_scroll_area.setWidget(left_content_widget)
-        
-        # Set fixed width for left panel to ensure proper layout
-        left_scroll_area.setFixedWidth(600)
-        
-        # Results panel
-        self.result_panel = ResultPanel()
-        self.result_panel.cv_view_requested.connect(self.show_cv_detail)
-        self.result_panel.cv_summary_requested.connect(self.show_cv_summary)
-        
-        content_layout.addWidget(left_scroll_area)
-        content_layout.addWidget(self.result_panel, 1)
-        
-        main_layout.addWidget(title)
-        main_layout.addLayout(content_layout)
-        
-        central_widget.setLayout(main_layout)
-    def perform_search(self, search_params):
-        keywords = search_params.get('keywords', '').split()
-        algorithm = search_params.get('algorithm', 'KMP')
-        max_results = search_params.get('max_results', 10)
 
-        results = SearchEngine.SearchExact(keywords, algorithm if algorithm != "Aho-Corasick" else "AC", max_results)
-        cv_list = []
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(30, 30, 30, 30)
+        main_layout.setSpacing(20)
 
-        for path, match_count in results:
-            raw_text = SearchEngine._preprocessed[path]
-            extracted = extract_cv_summary(raw_text)
+        search_layout = QHBoxLayout()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Enter keywords...")
+        self.search_input.setMinimumHeight(36)
+        self.search_input.textChanged.connect(self.perform_search)
 
-            profile = get_applicant_profile_by_cv_path(str(path.resolve()))
+        self.algorithm_dropdown = QComboBox()
+        self.algorithm_dropdown.addItems(["Aho-Corasick", "Boyer-Moore", "KMP"])
+        self.algorithm_dropdown.currentIndexChanged.connect(self.perform_search)
 
-            if profile:
-                full_name = f"{profile['first_name']} {profile['last_name']}"
-                birthdate = str(profile['date_of_birth'])
-                address = profile['address']
-                phone = profile['phone_number']
-            else:
-                first_line = raw_text.strip().split('\n', 1)[0]
-                full_name = first_line if len(first_line.split()) <= 5 else path.stem
-                birthdate = "Unknown"
-                address = "Unknown"
-                phone = "Unknown"
+        self.result_limit = QSpinBox()
+        self.result_limit.setRange(1, 100)
+        self.result_limit.setValue(10)
+        self.result_limit.valueChanged.connect(self.perform_search)
 
-            cv_list.append({
-                'name': full_name,
-                'matches': match_count,
-                'skills': ', '.join(extracted.get('skills', [])),
-                'experience': f"{len(extracted.get('job', []))} jobs",
-                'birthdate': birthdate,
-                'address': address,
-                'phone': phone,
-                'job_history': [],
-                'education': []
-            })
+        self.maximum_fuzzy = QSpinBox()
+        self.maximum_fuzzy.setRange(1, 10)
+        self.maximum_fuzzy.setValue(2)
 
-        self.result_panel.update_results(cv_list)
-        
-    def handle_file_upload(self, file_paths):
-        print(f"Files uploaded: {file_paths}")
-        self.result_panel.refresh_results()
-        
-    def show_cv_detail(self, cv_data):
-        if not self.detail_viewer:
-            self.detail_viewer = DetailViewer()
-        
-        self.detail_viewer.load_cv_data(cv_data)
-        self.detail_viewer.show()
-    
-    def show_cv_summary(self, item):
-        path = item.data(Qt.UserRole)
-        text = SearchEngine._preprocessed.get(path)
-        if not text:
-            QMessageBox.warning(self, "Error", "CV text not found.")
+        self.status_label = QLabel("")
+        self.status_label.setStyleSheet("color: gray; font-size: 13px;")
+
+        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(self.algorithm_dropdown)
+        search_layout.addWidget(self.result_limit)
+        search_layout.addWidget(self.maximum_fuzzy)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+
+        self.results_container = QWidget()
+        self.results_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+        self.results_layout = QGridLayout(self.results_container)
+        self.results_layout.setSpacing(20)
+        self.results_layout.setContentsMargins(10, 10, 10, 10)
+
+        for i in range(3):
+            self.results_layout.setColumnStretch(i, 1)
+
+        self.scroll_area.setWidget(self.results_container)
+
+        main_layout.addLayout(search_layout)
+        main_layout.addWidget(self.status_label)
+        main_layout.addWidget(self.scroll_area)
+
+    def perform_search(self):
+        # Clear existing widgets
+        while self.results_layout.count():
+            child = self.results_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+
+        if self.search_input.text() == "":
+            self.status_label.setText("")
             return
-        summary = extract_cv_summary(text)
 
-        cv_data = {
-            "skills": summary.get('skills', []),
-            "job": summary.get('job', []),
-            "education": summary.get('education', [])
+        # Extract input
+        keywords = [kw.strip() for kw in self.search_input.text().split(',') if kw.strip()]
+        algorithm = self.algorithm_dropdown.currentText()
+        max_results = self.result_limit.value()
+
+        algo_map = {
+            "Aho-Corasick": "AC",
+            "Boyer-Moore": "BM",
+            "KMP": "KMP"
         }
-        self.summary_dialog = CVSummaryPage(cv_data)
-        self.summary_dialog.show()
+        algo_code = algo_map.get(algorithm, "KMP")
 
-def main():
-    app = QApplication(sys.argv)
-    
-    # Set application style
-    app.setStyle('Fusion')
-    
-    # Set enhanced color palette with blue-purple theme
-    palette = QPalette()
-    palette.setColor(QPalette.Window, QColor(102, 126, 234))
-    palette.setColor(QPalette.WindowText, QColor(255, 255, 255))
-    palette.setColor(QPalette.Base, QColor(118, 75, 162))
-    palette.setColor(QPalette.AlternateBase, QColor(240, 147, 251))
-    app.setPalette(palette)
-    
-    window = ApplicantTrackingSystem()
-    window.show()
-    
-    sys.exit(app.exec_())
+        found = True
+        start1 = time.perf_counter()
+        results = SearchEngine.SearchExact(keywords, algo_code, max_results)
+        end1 = time.perf_counter()
+        if len(results) == 0:
+            start2 = time.perf_counter()
+            results_fuzzy = SearchEngine.SearchFuzzy(keywords, self.maximum_fuzzy.value(), max_results)
+            end2 = time.perf_counter()
+            found = False
 
-if __name__ == '__main__':
-    main()
+        # Render cards
+        if found:
+            columns = 3
+            for i, (path, score) in enumerate(results):
+                row = i // columns
+                col = i % columns
+                card = self.create_result_card(
+                    path,
+                    f"Found: {score}",
+                )
+                card.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                self.results_layout.addWidget(card, row, col)
+            self.status_label.setText(f"Found {len(results)} results in {end1 - start1:.4f}s")
+        else:
+            columns = 3
+            for i, (path, score) in enumerate(results_fuzzy):
+                row = i // columns
+                col = i % columns
+                card = self.create_result_card(
+                    path,
+                    f"Found: {score}",
+                )
+                card.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                self.results_layout.addWidget(card, row, col)
+            self.status_label.setText(f"Found {len(results_fuzzy)} results in {end2 - start2:.4f}s after searching exact match in {end1-start1:.4f}s")
+
+    def create_result_card(self, path, score):
+        cv_id = path.stem
+        card = QFrame()
+        card.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        card.setFrameShape(QFrame.StyledPanel)
+        card.setStyleSheet("""
+            QFrame {
+                background-color: #f5f5f5;
+                border-radius: 12px;
+                padding: 16px;
+                border: 1px solid black;
+            }
+            QLabel {
+                font-size: 14px;
+            }
+            QPushButton {
+                padding: 4px 12px;
+                border-radius: 6px;
+                background-color: #dcdcdc;
+            }
+            QPushButton:hover {
+                background-color: #cccccc;
+            }
+        """)
+
+        layout = QVBoxLayout(card)
+        layout.addWidget(QLabel(f"<b>{cv_id}</b>"))
+        layout.addWidget(QLabel(score))
+
+        button_layout = QHBoxLayout()
+        
+        summary_btn = QPushButton("Summary")
+        summary_btn.clicked.connect(lambda: self.show_info_window(f"Summary of {cv_id}", extract_cv_summary(SearchEngine._preprocessed[path])))
+
+        view_btn = QPushButton("View")
+        view_btn.clicked.connect(lambda _, p=path: QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(p).resolve()))))
+
+        button_layout.addWidget(summary_btn)
+        button_layout.addWidget(view_btn)
+        
+        layout.addLayout(button_layout)
+        return card
     
+    def show_info_window(self, title, content):
+        window = InfoWindow(title, content, self)
+        window.exec_()

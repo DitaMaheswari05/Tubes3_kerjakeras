@@ -1,21 +1,20 @@
-import mysql.connector # harus pertama
+import mysql.connector 
 from PyQt5.QtWidgets import QApplication
-import sys
 
 from SearchEngine import SearchEngine
 from database.Database import Database
 from database.Encryptor import Encryptor
-from ui.app import ApplicantTrackingSystem
+from ui import App
+
+import sys
 import time
 
 def main():
-    # SearchEngine.Initialize()
+    SearchEngine.Initialize()
     app = QApplication(sys.argv)
-    window = ApplicantTrackingSystem()
+    window = App()
     window.show()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    import multiprocessing
-    multiprocessing.freeze_support()
     main()
