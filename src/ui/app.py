@@ -180,8 +180,19 @@ class ApplicantTrackingSystem(QMainWindow):
         self.detail_viewer.load_cv_data(cv_data)
         self.detail_viewer.show()
     
-    def show_cv_summary(self, cv_data):
-        # Create new summary dialog each time to ensure fresh data
+    def show_cv_summary(self, item):
+        path = item.data(Qt.UserRole)
+        text = SearchEngine._preprocessed.get(path)
+        if not text:
+            QMessageBox.warning(self, "Error", "CV text not found.")
+            return
+        summary = extract_cv_summary(text)
+
+        cv_data = {
+            "skills": summary.get('skills', []),
+            "job": summary.get('job', []),
+            "education": summary.get('education', [])
+        }
         self.summary_dialog = CVSummaryPage(cv_data)
         self.summary_dialog.show()
 
@@ -206,3 +217,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

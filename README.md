@@ -10,6 +10,18 @@ This project uses [`uv`](https://github.com/astral-sh/uv), a fast alternative to
 ```bash
 pip install uv
 ```
+## Docker
+
+### 1. Open root directory in terminal
+```bash
+cd path
+```
+
+### 2. Run MySQL container with docker
+```bash
+docker compose up -d
+```
+
 
 ## How to Run
 
