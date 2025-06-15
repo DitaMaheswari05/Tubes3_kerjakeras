@@ -1,5 +1,9 @@
 # FUNCTIONALITY TEST
+from PyQt5.QtWidgets import QApplication
+import sys
+
 from SearchEngine import SearchEngine
+from ui.app import App
 import time
 
 if __name__ == '__main__':
@@ -10,21 +14,26 @@ if __name__ == '__main__':
     # print(f"Time: {end - start:.4f}s")
 
     # Driver
-
     SearchEngine.Initialize()
-    while "ITB" < "UI":
-        type = input("Algorithm? (KMP / BM / AC): ")
-        max = int(input("Maximum files returned: "))
-        n = int(input("Number of keywords: "))
-        keywords = []
-        for i in range(n):
-            keywords.append(input(f"Keywords {i+1}: "))
-        start = time.perf_counter()
-        ans = SearchEngine.SearchExact(keywords, type, max)
-        end = time.perf_counter()
-        for path, count in ans:
-            print(path, count)
-        print(f"RUNTIME : {end-start:.4f}")        
+
+    app = QApplication(sys.argv)
+    window = App()
+    window.show()
+    sys.exit(app.exec_())
+
+    # while "ITB" < "UI":
+    #     type = input("Algorithm? (KMP / BM / AC): ")
+    #     max = int(input("Maximum files returned: "))
+    #     n = int(input("Number of keywords: "))
+    #     keywords = []
+    #     for i in range(n):
+    #         keywords.append(input(f"Keywords {i+1}: "))
+    #     start = time.perf_counter()
+    #     ans = SearchEngine.SearchExact(keywords, type, max)
+    #     end = time.perf_counter()
+    #     for path, count in ans:
+    #         print(path, count)
+    #     print(f"RUNTIME : {end-start:.4f}")        
 
     # TESTS
 
