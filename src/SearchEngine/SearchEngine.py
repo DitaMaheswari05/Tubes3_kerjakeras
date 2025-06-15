@@ -14,12 +14,16 @@ class SearchEngine:
         print("Preprocessing files...")
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(FileParser.GetRawText, file) for file in pdf_files]
+            i = 0
             for file, future in zip(pdf_files, futures):
                 try:
+                    print(i)
+                    i = i + 1
                     text = future.result()
                     SearchEngine._preprocessed[file] = text
                 except Exception as e:
                     print(f"Failed to parse {file}: {e}")
+            print("don")
 
     @staticmethod
     def SearchExact(keywords: List[str], type: str, max: int = 5) -> List[Tuple[Path, int]]:

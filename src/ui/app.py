@@ -1,13 +1,16 @@
 import sys
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout,
-    QLineEdit, QComboBox, QLabel
+    QLineEdit, QComboBox, QLabel, QListWidget, 
+    QListWidgetItem, QMessageBox
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 import time
 
 from SearchEngine.SearchEngine import SearchEngine 
+from extraction.extractor import extract_cv_summary
+
 
 class App(QWidget):
     def __init__(self):
@@ -55,6 +58,9 @@ class App(QWidget):
 
         # Label
         self.keywords = QLabel()
+        self.result_list = QListWidget()
+        self.result_list.itemClicked.connect(self.show_summary)
+
 
         layout.addWidget(QLabel("Search"))
         layout.addWidget(self.search_input)
@@ -63,6 +69,10 @@ class App(QWidget):
         layout.addWidget(self.dropdown)
 
         layout.addWidget(self.keywords)
+        
+        layout.addWidget(QLabel("Results"))
+        layout.addWidget(self.result_list)
+
 
         self.setLayout(layout)
 
@@ -87,7 +97,23 @@ class App(QWidget):
             display_lines.append(f"\nTop Results: [{t2-t1:.4f}s]")
             for path, score in results:
                 display_lines.append(f"{str(path)} (score: {score})")
+                item = QListWidgetItem(f"{str(path)} (score: {score})")
+                item.setData(Qt.UserRole, path)
+                self.result_list.addItem(item)
         else:
             display_lines.append("\nNo matching results found.")
 
         self.keywords.setText("\n".join(display_lines))
+
+    def show_summary(self, item):
+        path = item.data(Qt.UserRole)
+        text = SearchEngine._preprocessed.get(path)
+        if not text:
+            QMessageBox.warning(self, "Error", "CV text not found.")
+            return
+        summary = extract_cv_summary(text)
+        msg = ""
+        msg += "Skills:\n- " + "\n- ".join(summary['skills']) + "\n\n"
+        msg += "Job Titles:\n- " + "\n- ".join(summary['job']) + "\n\n"
+        msg += "Education:\n- " + "\n- ".join(summary['education']) + "\n"
+        QMessageBox.information(self, "CV Summary", msg)
