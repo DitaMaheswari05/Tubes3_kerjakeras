@@ -1,9 +1,9 @@
 # FUNCTIONALITY TEST
+import mysql.connector # harus pertama
 from PyQt5.QtWidgets import QApplication
 import sys
 
 from SearchEngine import SearchEngine
-import mysql.connector
 from database.Database import Database
 from database.Encryptor import Encryptor 
 

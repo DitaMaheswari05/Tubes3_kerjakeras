@@ -1,4 +1,4 @@
-import mysql.connector
+import mysql.connector # harus pertama
 
 class Database:
     def __init__(self, host, port, user, password, database, encryptor):

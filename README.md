@@ -18,7 +18,6 @@ cd path
 ```
 
 ### 2. Run MySQL container with docker
-#### Make sure port 3306:3306 is available
 ```bash
 docker compose up -d
 ```

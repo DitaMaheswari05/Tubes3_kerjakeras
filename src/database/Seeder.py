@@ -1,7 +1,7 @@
+import mysql.connector # harus pertama
 from Database import Database
 from Encryptor import Encryptor
 import time
-import mysql.connector
 
 for _ in range(10):
     try:
