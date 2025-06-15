@@ -6,7 +6,6 @@ from SearchEngine import SearchEngine
 from database.Database import Database
 from database.Encryptor import Encryptor
 from ui.app import ApplicantTrackingSystem
-from ui.app import App
 import time
 
 def main():
