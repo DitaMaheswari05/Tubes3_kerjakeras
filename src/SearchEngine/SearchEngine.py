@@ -42,7 +42,42 @@ class SearchEngine:
 
         results.sort(key=lambda x: x[1], reverse=True)
         return results[:max]
-        
+    
+    @staticmethod
+    def SearchFuzzy(keywords: List[str], max_distance: int, max: int = 5) -> List[Tuple[Path, int]]:
+        def levenshtein(a: str, b: str) -> int:
+            if len(a) < len(b):
+                return levenshtein(b, a)
+
+            if len(b) == 0:
+                return len(a)
+
+            previous_row = list(range(len(b) + 1))
+            for i, c1 in enumerate(a):
+                current_row = [i + 1]
+                for j, c2 in enumerate(b):
+                    insertions = previous_row[j + 1] + 1
+                    deletions = current_row[j] + 1
+                    substitutions = previous_row[j] + (c1 != c2)
+                    current_row.append(min(insertions, deletions, substitutions))
+                previous_row = current_row
+
+            return previous_row[-1]
+
+        results: List[Tuple[Path, int]] = []
+        for path, text in SearchEngine._preprocessed.items():
+            words = text.split()
+            count = 0
+            for keyword in keywords:
+                for word in words:
+                    if levenshtein(keyword, word) <= max_distance:
+                        count += 1
+            if count > 0:
+                results.append((path, count))
+
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results[:max]
+
     @staticmethod
     def _build_kmp(keywords: List[str]) -> Callable[[str], int]:
         def _build_lps(pat: str) -> List[int]:
