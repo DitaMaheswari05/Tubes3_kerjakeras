@@ -1,14 +1,30 @@
-version: '3.8'
-
 services:
-  mysql:
+  db:
     image: mysql:8
-    container_name: tubes3-mysql
-    restart: always
+    container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: tubes3db
     ports:
-      - "3306:3306"
+      - "4306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      retries: 10
     volumes:
-      - ./tubes3_seeding.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/mysql
+
+  app:
+    build:
+      context: ./src/database
+    container_name: db-seeder
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "Seeder.py"]
+    volumes:
+      - ./src/database:/app
+    working_dir: /app
+
+volumes:
+  db_data:
